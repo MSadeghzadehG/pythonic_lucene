@@ -39,7 +39,7 @@ class IndexSearcher:
         analyzed_query = self.analyzer.analyze_val(query)
         tokens_result = [
             self.search_token(token) 
-            for token in analyzed_query.get_tokens_list()
+            for token in analyzed_query
         ]
         aggregated_token_result = Counter()
         for result in tokens_result:

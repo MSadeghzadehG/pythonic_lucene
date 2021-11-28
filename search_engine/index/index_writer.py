@@ -47,11 +47,6 @@ class IndexWriter:
                 for field_name, val in raw_doc.items()
             ]
         )
-        self.raw_docs[doc.get_id()] = doc
-        for field in doc.get_to_store_fields():
-            field.set_analyzed_data(
-                self.analyzer.analyze_val(field.get_raw_data())
-            )
 
         doc_freq = self.process_doc(doc.get_id(), doc.get_to_store_fields())
         max_term_freq = 0
@@ -63,6 +58,7 @@ class IndexWriter:
                 max_term_freq = doc_freq[term]['freq']
 
         self.indexed_docs[doc.get_id()] = {'doc_freq': doc_freq, 'max_term_freq': max_term_freq}
+        self.raw_docs[doc.get_id()] = doc
         self.count_of_docs += 1
 
     def add_documents(self, docs):
@@ -88,7 +84,7 @@ class IndexWriter:
 
     def process_field(self, field):
         field_freq = {}
-        for token in field.get_analyzed_data().get_tokens_list():
+        for token in self.analyzer.analyze_val(field.get_raw_data()):
             if token.value not in field_freq:
                 field_freq[token.value] = {'pos_list': [], 'len_list': []}
             field_freq[token.value]['pos_list'].append(token.position)

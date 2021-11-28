@@ -23,6 +23,8 @@ class IndexReader:
     def get_docs_id(self):
         return self.doc_freq.keys()
 
+    # def get_trem_freq_in_doc_field(self, doc_id, field, term):
+
     def get_term_freq_in_doc(self, doc_id, term):
         term_status = self.doc_freq[doc_id]['doc_freq'].get(term)
         return term_status['freq'] if term_status is not None else 0

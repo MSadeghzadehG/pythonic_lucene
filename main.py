@@ -7,7 +7,9 @@ import time
 from search_engine.index.index_writer import IndexWriter
 from search_engine.index.index_reader import IndexReader
 from search_engine.search.index_searcher import IndexSearcher
-from search_engine.analyzer.tokenizer import PersianTokenizer
+from search_engine.analyzer.char_filter import PersianCharFilter
+from search_engine.analyzer.tokenizer import StandardTokenizer
+from search_engine.analyzer.token_filter import StandardTokenFilter
 from search_engine.analyzer.analyzer import Analyzer
 
 
@@ -18,11 +20,10 @@ def read_excel():
 
 
 def main():
-    tokenizer = PersianTokenizer()
     analyzer = Analyzer(
-        char_filters=[],
-        tokenizer=tokenizer,
-        token_filters=[]
+        char_filters=[PersianCharFilter()],
+        tokenizer=StandardTokenizer(),
+        token_filters=[StandardTokenFilter()]
     )
     
     index = IndexWriter(
@@ -33,6 +34,7 @@ def main():
     df = read_excel()
     st = time.perf_counter() 
     index.add_documents([r.to_dict() for _,r in df.iterrows()])
+    # index.add_documents([{'content': 'in the name of god.'}, {'content': 'in practice it is needed to trust god!'}])
     print(time.perf_counter() -st)
     
     index_searcher = IndexSearcher(

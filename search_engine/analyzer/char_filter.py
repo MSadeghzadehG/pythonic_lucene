@@ -16,4 +16,4 @@ class PersianCharFilter(CharFilter):
             self.persian_chars[persian[i]] = i
 
     def process(self, char):
-        return char if char in self.persian_chars else None
+        return char #if char in self.persian_chars else None
