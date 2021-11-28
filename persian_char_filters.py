@@ -4,7 +4,7 @@ from search_engine.analyzer.char_filter import CharFilter
 class PersianCharFilter(CharFilter):
 
     def __init__(self):
-        persian = [' ','\u200c','آ','ا','ب','پ','ت','ث','ج','چ','ح','خ','د','ذ','ر','ز','ژ','س','ش','ص','ض','ط','ظ','ع','غ','ف','ق','ک','گ','ل','م','ن','و' ,'ه','ی']
+        persian = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك'
         self.persian_chars = {
             char: 1
             for char in persian
@@ -12,3 +12,16 @@ class PersianCharFilter(CharFilter):
         
     def process(self, char):
         return char if char in self.persian_chars else None
+
+
+class BadCharFilter(CharFilter):
+
+    def __init__(self):
+        bad = '\\s.,;،؛!؟?"\'()[\\]{}“”«»\n'
+        self.bad_chars = {
+            char: 1
+            for char in bad
+        }
+        
+    def process(self, char):
+        return None if char in self.bad_chars else char
