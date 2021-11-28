@@ -6,10 +6,12 @@ import time
 from search_engine.index.index_writer import IndexWriter
 from search_engine.index.index_reader import IndexReader
 from search_engine.search.index_searcher import IndexSearcher
-from search_engine.analyzer.char_filter import PersianCharFilter
 from search_engine.analyzer.tokenizer import StandardTokenizer
-from search_engine.analyzer.token_filter import PersianStopFilter, PersianStemFilter
 from search_engine.analyzer.analyzer import Analyzer
+from persian_char_filters import PersianCharFilter
+from persian_token_filters import (
+    PersianStopFilter, PersianStemFilter, PersianNormalizeFilter
+)
 
 
 def read_excel():
@@ -22,7 +24,11 @@ def main():
     analyzer = Analyzer(
         char_filters=[PersianCharFilter()],
         tokenizer=StandardTokenizer(),
-        token_filters=[PersianStopFilter('persian_stops.txt'), PersianStemFilter()]
+        token_filters=[
+            PersianStopFilter('persian_stops.txt'),
+            PersianNormalizeFilter(),
+            PersianStemFilter()
+        ]
     )
     
     index = IndexWriter(

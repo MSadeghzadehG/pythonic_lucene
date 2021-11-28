@@ -2,11 +2,21 @@ import numpy as np
 
 
 class Similarity:
+    '''
+    Similarity defines the components of Lucene scoring. 
+
+    Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/search/similarities/Similarity.html
+    Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/search/similarities/Similarity.java
+    '''
     pass
 
 
 class TFIDFSimilarity(Similarity):
-
+    '''
+    Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/search/similarities/TFIDFSimilarity.html
+    Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/search/similarities/TFIDFSimilarity.java
+    '''
+    
     def tf(self, freq, norm):
         return freq / norm
 

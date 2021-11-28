@@ -1,12 +1,13 @@
 class Analyzer:
+    '''
+    An Analyzer builds TokenGraphs, which analyze text. It thus represents a policy for extracting index terms from text. 
+
+    Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/analysis/Analyzer.html
+    Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/analysis/Analyzer.java    
+    '''
 
     def __init__(self, char_filters, tokenizer, token_filters):
         '''
-        An Analyzer builds TokenGraphs, which analyze text. It thus represents a policy for extracting index terms from text. 
-
-        Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/analysis/Analyzer.html
-        Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/analysis/Analyzer.java
-        
         filters order is importrant.
         '''
         self.char_filters = char_filters

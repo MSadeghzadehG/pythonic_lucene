@@ -8,6 +8,7 @@ class Query:
     Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/search/Query.html
     Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/search/Query.java
     '''
+    
     def __init__(self, boost):
         self.boost = boost
 

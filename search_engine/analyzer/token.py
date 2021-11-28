@@ -11,6 +11,7 @@ class TokenType(Enum):
 
 
 class Token:
+
     def __init__(self, value, position, length, token_type=TokenType.ALPHANUM):
         self.value = value
         self.position = position

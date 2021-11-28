@@ -1,12 +1,17 @@
 from .token import Token
 
+
 class Tokenizer:
+    '''
+    A Tokenizer is a TokenStream whose input is a CharStream. 
+
+    Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/analysis/Tokenizer.html
+    Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/analysis/Tokenizer.java    
+    '''
 
     def tokenize(self, char_stream):
         '''
-        A Tokenizer is a TokenStream whose input is a Reader. 
-
-        returns a token_graph.
+        returns a token generator.
         '''
         raise NotImplementedError("Please Implement this method")
 

@@ -11,6 +11,7 @@ class IndexSearcher:
     Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/search/IndexSearcher.html
     Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/search/IndexSearcher.java
     '''
+    
     def __init__(self, index_reader, analyzer, score_threshold=0.01):
         self.reader = index_reader
         self.analyzer = analyzer
