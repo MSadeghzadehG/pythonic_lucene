@@ -85,10 +85,11 @@ class IndexWriter:
     def process_field(self, field):
         field_freq = {}
         for token in self.analyzer.analyze_val(field.get_raw_data()):
-            if token.value not in field_freq:
-                field_freq[token.value] = {'pos_list': [], 'len_list': []}
-            field_freq[token.value]['pos_list'].append(token.position)
-            field_freq[token.value]['len_list'].append(token.length)
+            if token is not None:
+                if token.value not in field_freq:
+                    field_freq[token.value] = {'pos_list': [], 'len_list': []}
+                field_freq[token.value]['pos_list'].append(token.position)
+                field_freq[token.value]['len_list'].append(token.length)
         return field_freq
 
     def process_doc(self, doc_id, fields):

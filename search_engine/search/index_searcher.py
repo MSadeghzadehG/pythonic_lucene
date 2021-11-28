@@ -11,9 +11,10 @@ class IndexSearcher:
     Doc: https://lucene.apache.org/core/8_11_0/core/org/apache/lucene/search/IndexSearcher.html
     Code: https://github.com/apache/lucene/blob/main/lucene/core/src/java/org/apache/lucene/search/IndexSearcher.java
     '''
-    def __init__(self, index_reader, analyzer):
+    def __init__(self, index_reader, analyzer, score_threshold=0.01):
         self.reader = index_reader
         self.analyzer = analyzer
+        self.score_threshold = score_threshold
         self.similarity = TFIDFSimilarity()
 
     def search_token(self, token):
@@ -23,15 +24,16 @@ class IndexSearcher:
 
         all_fields_score = {}
         for doc_id in self.reader.get_docs_id():
-            score = self.similarity.score(
-                freq=self.reader.get_term_freq_in_doc(doc_id,token.value),
-                idf_val=idf_val,
-                boost=1,
-                norm=self.reader.get_doc_max_freq(doc_id)
-            )
-            if score != 0:
-                all_fields_score[doc_id] = score
-
+            if self.reader.get_doc_max_freq(doc_id) != 0:
+                score = self.similarity.score(
+                    freq=self.reader.get_term_freq_in_doc(doc_id,token.value),
+                    idf_val=idf_val,
+                    boost=1,
+                    norm=self.reader.get_doc_max_freq(doc_id)
+                )
+                if score >= self.score_threshold:
+                    all_fields_score[doc_id] = score
+            
         return all_fields_score
 
     # public LucenePageResults search(final Query qry,Set<SortField> sortFields, final int firstResultItemOrder,final int numberOfResults) {

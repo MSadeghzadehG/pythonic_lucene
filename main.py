@@ -1,6 +1,5 @@
 #!/usr/local/bin/python3
 # -*- coding: utf-8 -*- 
-
 import pandas as pd
 import time
 
@@ -9,7 +8,7 @@ from search_engine.index.index_reader import IndexReader
 from search_engine.search.index_searcher import IndexSearcher
 from search_engine.analyzer.char_filter import PersianCharFilter
 from search_engine.analyzer.tokenizer import StandardTokenizer
-from search_engine.analyzer.token_filter import StandardTokenFilter
+from search_engine.analyzer.token_filter import PersianStopFilter, PersianStemFilter
 from search_engine.analyzer.analyzer import Analyzer
 
 
@@ -23,7 +22,7 @@ def main():
     analyzer = Analyzer(
         char_filters=[PersianCharFilter()],
         tokenizer=StandardTokenizer(),
-        token_filters=[StandardTokenFilter()]
+        token_filters=[PersianStopFilter('persian_stops.txt'), PersianStemFilter()]
     )
     
     index = IndexWriter(
@@ -36,7 +35,6 @@ def main():
     index.add_documents([r.to_dict() for _,r in df.iterrows()])
     # index.add_documents([{'content': 'in the name of god.'}, {'content': 'in practice it is needed to trust god!'}])
     print(time.perf_counter() -st)
-    
     index_searcher = IndexSearcher(
         index_reader=IndexReader(name='test'),
         analyzer=analyzer

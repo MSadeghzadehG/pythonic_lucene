@@ -1,5 +1,4 @@
-from enum import Enum
-
+from .token import Token
 
 class Tokenizer:
 
@@ -21,22 +20,17 @@ class StandardTokenizer(Tokenizer):
     def is_token(self, token):
         return token != ''
 
-    def get_char(self,char_stream):
-        try:
-            return char_stream.__next__()
-        except StopIteration:
-            return None
-
     def get_word(self, char_stream):
         while True:
-            char = self.get_char(char_stream)
-            if char is not None:
-                if char == self.delimiter and self.is_token(self.token):
-                    o = self.token
-                    self.token = ''
-                    yield o
-                self.token += char
-            else:
+            try:
+                char = char_stream.__next__()
+                if char is not None:
+                    if char == self.delimiter and self.is_token(self.token):
+                        o = self.token
+                        self.token = ''
+                        yield o
+                    self.token += char
+            except StopIteration:
                 if self.is_token(self.token):
                     o = self.token
                     self.token = ''
@@ -55,23 +49,3 @@ class StandardTokenizer(Tokenizer):
                 yield token
         except StopIteration:
             pass
-
-
-class TokenType(Enum):
-    ALPHA = 1
-    ALPHANUM = 2
-    DIGIT = 3
-    LOWER = 4
-    SUBWORD_DELIM = 5
-    UPPER = 6
-
-
-class Token:
-    def __init__(self, value, position, length, token_type=TokenType.ALPHANUM):
-        self.value = value
-        self.position = position
-        self.token_type = token_type
-        self.length = length
-    
-    def get_val(self):
-        return self.value

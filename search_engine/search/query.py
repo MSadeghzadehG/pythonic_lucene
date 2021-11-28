@@ -31,6 +31,13 @@ class BooleanClause:
         self.occur = occur
 
 
+class TermQuery(Query):
+    
+    def __init__(self, boost, term):
+        super(TermQuery, self).__init__(boost)
+        self.term = term
+
+
 class BooleanQuery(Query):
     '''
     A Query that matches documents matching boolean combinations of other queries, e.g. TermQuerys, PhraseQuerys or other BooleanQuerys.
