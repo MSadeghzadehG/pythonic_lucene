@@ -43,11 +43,18 @@ class IndexSearcher:
         tokens_result = [
             self.search_token(token) 
             for token in analyzed_query
+            if token is not None
         ]
-        aggregated_token_result = Counter()
-        for result in tokens_result:
-            aggregated_token_result.update(result)
         
+        aggregated_token_result = tokens_result[0]
+        for result in tokens_result[1:]:
+            aggregated_token_result = {
+                k: s0+s1
+                for k, s0 in result.items()
+                for j, s1 in aggregated_token_result.items()
+                if k == j
+            }
+
         docs = self.reader.get_raw_docs()
         
         sorted_result = dict(sorted(
@@ -57,9 +64,14 @@ class IndexSearcher:
         )[:number_of_results])
 
         filtered_result = {
-            docs[doc_id].get_raw_field(retrievable_field): score
+            doc_id: {
+                'score': score,
+                'fields': {
+                    retrievable_field: docs[doc_id].get_raw_field(retrievable_field)
+                    for retrievable_field in retrievable_fields
+                }
+            } 
             for doc_id, score in sorted_result.items()
-            for retrievable_field in retrievable_fields
         }
 
         return filtered_result

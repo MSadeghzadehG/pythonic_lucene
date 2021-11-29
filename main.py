@@ -1,19 +1,23 @@
 #!/usr/local/bin/python3
 # -*- coding: utf-8 -*- 
 import pandas as pd
+import numpy as np
 import time
 
 from ujson import dumps
 from os.path import join
+import matplotlib.pyplot as plt
 
 from search_engine.index.index_writer import IndexWriter
 from search_engine.index.index_reader import IndexReader
 from search_engine.search.index_searcher import IndexSearcher
 from search_engine.analyzer.tokenizer import StandardTokenizer
 from search_engine.analyzer.analyzer import Analyzer
+from search_engine.analyzer.char_filter import WhitespcaesCharFilter
 from persian_char_filters import PersianCharFilter, BadCharFilter
 from persian_token_filters import (
-    PersianStopFilter, PersianStemFilter, PersianNormalizeFilter
+    PersianStopFileFilter, PersianStemFilter,
+    PersianNormalizeFilter, RemoveSpaceFilter
 )
 
 
@@ -23,17 +27,7 @@ def read_excel():
     return df
 
 
-def main():
-    analyzer = Analyzer(
-        char_filters=[BadCharFilter()],
-        tokenizer=StandardTokenizer(),
-        token_filters=[
-            PersianStopFilter('persian_stops.txt'),
-            PersianNormalizeFilter(),
-            PersianStemFilter()
-        ]
-    )
-    
+def write_index(analyzer):
     index = IndexWriter(
         name='test',
         analyzer=analyzer,
@@ -42,18 +36,23 @@ def main():
     df = read_excel()
     st = time.perf_counter() 
     index.add_documents([r.to_dict() for _,r in df.iterrows()])
-    # index.add_documents([{'content': 'in the name of god.'}, {'content': 'in practice it is needed to trust god!'}])
     print(time.perf_counter() -st)
     
-    index_reader = IndexReader(name='test')
-    # docs_freq = index_reader.get_all_docs_freq()
-    # print(docs_freq)
 
-    index_searcher = IndexSearcher(
-        index_reader=index_reader,
-        analyzer=analyzer
-    )
+def cal_zipf(index_reader):
+    all_docs_freq = index_reader.get_all_docs_freq()['docs_freq']
+    # print(docs_freq[0])
+    z = dict(sorted(all_docs_freq.items(),
+            key=lambda x: x[1],
+            reverse=True))
+    zk = list(map(np.lg, np.arange(0, len(z.keys()), 1)))
+    zv = list(map(np.lg, z.values()))
+    plt.plot(zk, zv, color="red")
+    plt.plot([i for i in range(0,11)], [i for i in range(10, -1, -1)], color='green')
+    plt.show()
 
+
+def search_queries(index_searcher):
     queries = [ 'واکسن آسترازنکا' , 'ژیمناستیک' , 'بین‌الملل' , 'دانشگاه امیرکبیر' , 'جمهوری اسلامی ایران' , 'سازمان ملل متحد' , 'دانشگاه صنعتی امیرکبیر' ]
     for q in queries:
         with open(join('test_results', q) + '.json', 'w') as f: 
@@ -61,19 +60,59 @@ def main():
             results = index_searcher.search(
                 query=q,
                 number_of_results=10,
-                retrievable_fields=['title']
+                retrievable_fields=['title', 'content']
             )
             elapsed_time = time.perf_counter() - start_time
+            filtered_results = {
+                result['fields']['title']: {
+                    'score': result['score'],
+                    'content': result['fields']['content'],
+                    'matched_terms': [
+                        (s.value, s.position)
+                        for s in index_searcher.analyzer.analyze_val(result['fields']['content'])
+                        for a_q in index_searcher.analyzer.analyze_val(q) 
+                        if a_q and s and a_q.value == s.value
+                    ]
+                }
+                for doc_id, result in results.items()
+            }
             f.write(dumps(
                 {
                     'query': q,
                     'elapsed_time': elapsed_time, 
-                    'top 10 results': results
+                    'top 10 results': filtered_results
                 },
                 ensure_ascii=False,
                 indent=4
             ))
 
+
+
+def main():
+    analyzer = Analyzer(
+        char_filters=[
+            WhitespcaesCharFilter(),
+            BadCharFilter(),
+            PersianCharFilter()
+        ],
+        tokenizer=StandardTokenizer(),
+        token_filters=[
+            RemoveSpaceFilter(),
+            PersianNormalizeFilter(),
+            PersianStopFileFilter('persian_stops.txt'),
+            PersianStemFilter(),
+        ]
+    )
+    
+    write_index(analyzer)
+
+    index_reader = IndexReader(name='test')
+    
+    index_searcher = IndexSearcher(
+        index_reader=index_reader,
+        analyzer=analyzer
+    )
+    search_queries(index_searcher)
 
 
 if __name__ == "__main__":

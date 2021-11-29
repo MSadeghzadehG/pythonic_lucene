@@ -32,6 +32,9 @@ class IndexReader:
 
     def get_docs_freq(self, term):
         return self.all_docs_freq['docs_freq'].get(term, 0)
+
+    def get_all_docs_freq(self):
+        return self.all_docs_freq
     
     def get_docs_count(self):
         return self.all_docs_freq['count']
