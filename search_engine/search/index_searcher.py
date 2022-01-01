@@ -59,17 +59,16 @@ class IndexSearcher:
             if token is not None
         ]
 
-        aggregated_results = []
-        for token_result in tokens_result:
-            aggregated_results += token_result
-
-        has_min_tokens = [
-            (item, count)
-            for item, count in Counter(aggregated_results).items()
-            if count > min_token
-        ]
-        print(tokens_result)
-        print(has_min_tokens)
+        has_min_tokens = []
+        if min_token is not None:
+            aggregated_results = []
+            for token_result in tokens_result:
+                aggregated_results += token_result
+            has_min_tokens = [
+                item
+                for item, count in Counter(aggregated_results).items()
+                if count >= min_token
+            ]
 
         aggregated_token_result = tokens_result[0]
         for result in tokens_result[1:]:
@@ -77,10 +76,9 @@ class IndexSearcher:
                 k: s0 + s1
                 for k, s0 in result.items()
                 for j, s1 in aggregated_token_result.items()
-                if k == j and (min_token is not None and k in has_min_tokens)
+                if k == j
+                and ((min_token and j in has_min_tokens) or not min_token)
             }
-        print(aggregated_token_result)
-
         docs = self.reader.get_raw_docs()
 
         sorted_result = nlargest(

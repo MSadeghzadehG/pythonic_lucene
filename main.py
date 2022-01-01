@@ -59,6 +59,7 @@ def search_queries(index_searcher):
                 query=q,
                 number_of_results=10,
                 retrievable_fields=["title", "content"],
+                min_token=2,
             )
             elapsed_time = time.perf_counter() - start_time
             filtered_results = {
